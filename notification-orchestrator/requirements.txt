@@ -1,0 +1,8 @@
+fastapi>=0.95.0
+uvicorn>=0.21.1
+pydantic>=1.10.7
+aio-pika>=9.0.5
+redis>=4.5.4
+python-dotenv>=1.0.0
+httpx>=0.24.0
+uuid>=1.30

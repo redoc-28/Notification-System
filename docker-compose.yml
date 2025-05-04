@@ -1,0 +1,180 @@
+version: '3.8'
+
+services:
+  # Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"  # AMQP protocol port
+      - "15672:15672"  # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=adminpass
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Cache & Rate Limiting
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Database
+  postgres:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=notification_system
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Notification Orchestrator Service
+  notification-orchestrator:
+    build: ./notification-orchestrator
+    ports:
+      - "8000:8000"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=admin
+      - RABBITMQ_PASS=adminpass
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - API_PREFIX=/api/v1
+      - DEBUG=True
+    depends_on:
+      - rabbitmq
+      - redis
+      - postgres
+    restart: on-failure
+
+  # Email Service
+  email-service:
+    build: ./email-service
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=admin
+      - RABBITMQ_PASS=adminpass
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=notification_system
+      - DEBUG=True
+    depends_on:
+      - rabbitmq
+      - postgres
+    restart: on-failure
+
+  # SMS Service
+  sms-service:
+    build: ./sms-service
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=admin
+      - RABBITMQ_PASS=adminpass
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=notification_system
+      - DEBUG=True
+    depends_on:
+      - rabbitmq
+      - postgres
+    restart: on-failure
+
+  # Push Service
+  push-service:
+    build: ./push-service
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=admin
+      - RABBITMQ_PASS=adminpass
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=notification_system
+      - DEBUG=True
+    depends_on:
+      - rabbitmq
+      - postgres
+    restart: on-failure
+
+  # Preferences Service
+  preferences-service:
+    build: ./preferences-service
+    ports:
+      - "8001:8000"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=notification_system
+      - API_PREFIX=/api/v1
+      - DEBUG=True
+    depends_on:
+      - postgres
+    restart: on-failure
+
+  # Logging Service
+  logging-service:
+    build: ./logging-service
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=admin
+      - RABBITMQ_PASS=adminpass
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=notification_system
+      - DEBUG=True
+    depends_on:
+      - rabbitmq
+      - postgres
+    restart: on-failure
+
+  # Dashboard Service
+  dashboard-service:
+    build: ./dashboard-service
+    ports:
+      - "8002:8000"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=notification_system
+      - API_PREFIX=/api/v1
+      - DEBUG=True
+    depends_on:
+      - postgres
+    restart: on-failure
+
+volumes:
+  rabbitmq_data:
+  redis_data:
+  postgres_data:
