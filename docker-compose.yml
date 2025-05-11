@@ -1,12 +1,12 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Message Broker
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"  # AMQP protocol port
-      - "15672:15672"  # Management UI
+      - "5672:5672" # AMQP protocol port
+      - "15672:15672" # Management UI
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=adminpass

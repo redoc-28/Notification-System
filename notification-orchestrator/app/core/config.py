@@ -1,5 +1,5 @@
 import os
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from typing import Optional, Dict, Any
 from functools import lru_cache
 
@@ -15,8 +15,8 @@ class Settings(BaseSettings):
     # RabbitMQ Settings
     RABBITMQ_HOST: str = "localhost"
     RABBITMQ_PORT: int = 5672
-    RABBITMQ_USER: str = "guest"
-    RABBITMQ_PASS: str = "guest"
+    RABBITMQ_USER: str = "admin"
+    RABBITMQ_PASS: str = "adminpass"
     RABBITMQ_VHOST: str = "/"
     
     # RabbitMQ Exchange and Queue Names

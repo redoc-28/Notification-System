@@ -1,0 +1,38 @@
+flowchart TD
+    Client[Client Application] --> NO[Notification Orchestrator]
+    
+    subgraph Services
+        NO --> RB[RabbitMQ]
+        NO --> RD[Redis]
+        NO --> PS[Preferences Service]
+        
+        RB --> ES[Email Service]
+        RB --> SS[SMS Service]
+        RB --> PS2[Push Service]
+        
+        ES --> DB[(PostgreSQL)]
+        SS --> DB
+        PS2 --> DB
+        PS --> DB
+        
+        DS[Dashboard Service] --> DB
+    end
+    
+    subgraph External
+        ES --> ESP[Email Service Providers]
+        SS --> SSP[SMS Service Providers]
+        PS2 --> PSP[Push Service Providers]
+    end
+    
+    Client --> PS
+    Client --> DS
+    
+    classDef primary fill:#4285F4,stroke:#4285F4,color:white;
+    classDef secondary fill:#34A853,stroke:#34A853,color:white;
+    classDef database fill:#FBBC05,stroke:#FBBC05,color:white;
+    classDef external fill:#EA4335,stroke:#EA4335,color:white;
+    
+    class NO,PS,DS primary;
+    class ES,SS,PS2 secondary;
+    class RB,RD,DB database;
+    class ESP,SSP,PSP external;

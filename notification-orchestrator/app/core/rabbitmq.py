@@ -55,6 +55,7 @@ class RabbitMQClient:
         # Common arguments for all queues
         queue_args = {
             "x-dead-letter-exchange": self.settings.DLX_EXCHANGE,
+            "x-dead-letter-routing-key": "notification.email.failed"
         }
         
         # Declare email queue
@@ -70,7 +71,10 @@ class RabbitMQClient:
             f"{self.settings.EMAIL_QUEUE}.dlq",
             durable=True
         )
-        await email_dlq.bind(self.dlx_exchange, routing_key="notification.email")
+        await email_dlq.bind(self.dlx_exchange, routing_key="notification.email.failed")
+        
+        # Update queue args for SMS queue
+        queue_args["x-dead-letter-routing-key"] = "notification.sms.failed"
         
         # Declare SMS queue
         sms_queue = await self.channel.declare_queue(
@@ -85,7 +89,10 @@ class RabbitMQClient:
             f"{self.settings.SMS_QUEUE}.dlq",
             durable=True
         )
-        await sms_dlq.bind(self.dlx_exchange, routing_key="notification.sms")
+        await sms_dlq.bind(self.dlx_exchange, routing_key="notification.sms.failed")
+        
+        # Update queue args for push queue
+        queue_args["x-dead-letter-routing-key"] = "notification.push.failed"
         
         # Declare push notification queue
         push_queue = await self.channel.declare_queue(
@@ -100,7 +107,7 @@ class RabbitMQClient:
             f"{self.settings.PUSH_QUEUE}.dlq",
             durable=True
         )
-        await push_dlq.bind(self.dlx_exchange, routing_key="notification.push")
+        await push_dlq.bind(self.dlx_exchange, routing_key="notification.push.failed")
 
     async def publish_message(self, routing_key: str, message_data: Dict[str, Any], 
                              headers: Optional[Dict[str, Any]] = None, 

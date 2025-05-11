@@ -1,0 +1,8 @@
+aio-pika>=9.0.5
+sqlalchemy>=2.0.0
+asyncpg>=0.27.0
+pydantic>=1.10.7
+firebase-admin>=6.2.0
+aioapns>=2.1.0
+pywebpush>=1.14.0
+python-dotenv>=1.0.0
