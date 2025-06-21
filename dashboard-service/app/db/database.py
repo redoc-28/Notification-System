@@ -57,7 +57,7 @@ class EmailDeliveryLogModel(Base):
     provider_message_id = Column(String, nullable=True)
     error_message = Column(Text, nullable=True)
     retry_count = Column(Integer, nullable=False, default=0)
-    metadata = Column(JSON, nullable=True)
+    email_metadata = Column(JSON, nullable=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
 
@@ -78,7 +78,7 @@ class SMSDeliveryLogModel(Base):
     provider_message_id = Column(String, nullable=True)
     error_message = Column(Text, nullable=True)
     retry_count = Column(Integer, nullable=False, default=0)
-    metadata = Column(JSON, nullable=True)
+    sms_metadata = Column(JSON, nullable=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
 
@@ -101,7 +101,7 @@ class PushDeliveryLogModel(Base):
     provider_message_id = Column(String, nullable=True)
     error_message = Column(Text, nullable=True)
     retry_count = Column(Integer, nullable=False, default=0)
-    metadata = Column(JSON, nullable=True)
+    notification_metadata = Column(JSON, nullable=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
 
@@ -127,9 +127,10 @@ async def init_db():
     try:
         async with engine.begin() as conn:
             # Only create our own tables - the delivery logs are managed by other services
-            await conn.run_sync(lambda metadata: metadata.create_all(
+            await conn.run_sync(
+                Base.metadata.create_all,
                 tables=[DailyStatsModel.__table__]
-            ))
+            )
         logger.info("Database initialized successfully")
     except Exception as e:
         logger.error(f"Error initializing database: {str(e)}")
@@ -204,7 +205,7 @@ class DatabaseClient:
                             delivered_at=log.delivered_at,
                             error_message=log.error_message,
                             retry_count=log.retry_count,
-                            metadata=log.metadata,
+                            metadata=log.email_metadata,
                             created_at=log.created_at,
                             updated_at=log.updated_at
                         ))
@@ -242,7 +243,7 @@ class DatabaseClient:
                             delivered_at=log.delivered_at,
                             error_message=log.error_message,
                             retry_count=log.retry_count,
-                            metadata=log.metadata,
+                            metadata=log.sms_metadata,
                             created_at=log.created_at,
                             updated_at=log.updated_at
                         ))
@@ -280,7 +281,7 @@ class DatabaseClient:
                             delivered_at=log.delivered_at,
                             error_message=log.error_message,
                             retry_count=log.retry_count,
-                            metadata=log.metadata,
+                            metadata=log.notification_metadata,
                             created_at=log.created_at,
                             updated_at=log.updated_at
                         ))
@@ -336,7 +337,7 @@ class DatabaseClient:
                         delivered_at=log.delivered_at,
                         error_message=log.error_message,
                         retry_count=log.retry_count,
-                        metadata=log.metadata,
+                        metadata=log.email_metadata,
                         created_at=log.created_at,
                         updated_at=log.updated_at
                     ))
@@ -363,7 +364,7 @@ class DatabaseClient:
                         delivered_at=log.delivered_at,
                         error_message=log.error_message,
                         retry_count=log.retry_count,
-                        metadata=log.metadata,
+                        metadata=log.sms_metadata,
                         created_at=log.created_at,
                         updated_at=log.updated_at
                     ))
@@ -390,7 +391,7 @@ class DatabaseClient:
                         delivered_at=log.delivered_at,
                         error_message=log.error_message,
                         retry_count=log.retry_count,
-                        metadata=log.metadata,
+                        metadata=log.notification_metadata,
                         created_at=log.created_at,
                         updated_at=log.updated_at
                     ))

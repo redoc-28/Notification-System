@@ -50,7 +50,7 @@ class NotificationLogModel(Base):
     provider_message_id = Column(String, nullable=True)
     error_message = Column(Text, nullable=True)
     retry_count = Column(Integer, nullable=False, default=0)
-    metadata = Column(JSON, nullable=True)
+    log_metadata = Column(JSON, nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
 
 
@@ -64,7 +64,7 @@ class SystemLogModel(Base):
     message = Column(Text, nullable=False)
     correlation_id = Column(String, nullable=True, index=True)
     user_id = Column(String, nullable=True, index=True)
-    metadata = Column(JSON, nullable=True)
+    log_metadata = Column(JSON, nullable=True)
     timestamp = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
 
 
@@ -121,7 +121,7 @@ class DatabaseClient:
                     provider_message_id=log_data.get('provider_message_id'),
                     error_message=log_data.get('error_message'),
                     retry_count=log_data.get('retry_count', 0),
-                    metadata=log_data.get('metadata'),
+                    log_metadata=log_data.get('metadata'),
                     created_at=log_data.get('created_at', datetime.utcnow())
                 )
                 
@@ -158,7 +158,7 @@ class DatabaseClient:
                     message=log_data['message'],
                     correlation_id=log_data.get('correlation_id'),
                     user_id=log_data.get('user_id'),
-                    metadata=log_data.get('metadata'),
+                    log_metadata=log_data.get('metadata'),
                     timestamp=log_data.get('timestamp', datetime.utcnow())
                 )
                 

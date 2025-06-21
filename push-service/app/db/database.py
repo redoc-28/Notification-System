@@ -52,7 +52,7 @@ class PushDeliveryLogModel(Base):
     provider_message_id = Column(String, nullable=True)
     error_message = Column(Text, nullable=True)
     retry_count = Column(Integer, nullable=False, default=0)
-    metadata = Column(JSON, nullable=True)
+    notification_metadata = Column(JSON, nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -128,7 +128,7 @@ class DatabaseClient:
                     provider_message_id=provider_message_id,
                     error_message=error_message,
                     retry_count=retry_count,
-                    metadata=metadata
+                    notification_metadata=metadata
                 )
                 
                 # Add to session
