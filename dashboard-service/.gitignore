@@ -1,0 +1,20 @@
+# Ignore compiled artifacts (e.g. __pycache__ or .pyc files)
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environment (if any)
+venv/
+env/
+myenv/
+
+# Ignore log files (if any)
+*.log
+
+# Ignore local config (if any)
+.env
+
+# Ignore IDE (e.g. .vscode, .idea) (if any)
+.vscode/
+.idea/
+
+# Ignore (or add) any other project-specific ignores below 

@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     
     # Rate Limiting
     RATE_LIMIT_ENABLED: bool = True
-    RATE_LIMIT_DEFAULT: int = 10  # default requests per minute
+    RATE_LIMIT_DEFAULT: int = 10 # default requests per minute
     RATE_LIMIT_USER_MAP: Dict[str, int] = {}  # user_id: rate_limit
     
     # Deduplication

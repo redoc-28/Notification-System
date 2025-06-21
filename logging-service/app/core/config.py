@@ -1,5 +1,5 @@
 import os
-from pydantic_settings import BaseSettings
+from pydantic import BaseSettings
 from typing import Optional, Dict, Any
 from functools import lru_cache
 
@@ -7,7 +7,7 @@ from functools import lru_cache
 class Settings(BaseSettings):
     # Service Settings
     DEBUG: bool = False
-    SERVICE_NAME: str = "SMS Service"
+    SERVICE_NAME: str = "Logging Service"
     VERSION: str = "0.1.0"
     
     # RabbitMQ Settings
@@ -19,9 +19,9 @@ class Settings(BaseSettings):
     
     # RabbitMQ Queue Names
     EXCHANGE_NAME: str = "notifications"
-    SMS_QUEUE: str = "sms_notifications"
-    DLX_EXCHANGE: str = "notifications.dlx"  # Dead Letter Exchange
-    DLQ_QUEUE: str = "sms_notifications.dlq"  # Dead Letter Queue
+    LOGGING_QUEUE: str = "notification_logs"
+    SYSTEM_LOGS_QUEUE: str = "system_logs"
+    DLX_EXCHANGE: str = "notifications.dlx"
     
     # PostgreSQL Settings
     POSTGRES_HOST: str = "localhost"
@@ -30,29 +30,17 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "notification_system"
     
-    # SMS Provider Settings
-    SMS_PROVIDER: str = "twilio"  # Options: twilio, sns, nexmo
-    DEFAULT_SENDER_ID: str = "CompanyName"
+    # Logging Configuration
+    LOG_LEVEL: str = "INFO"
+    LOG_RETENTION_DAYS: int = 30
+    BATCH_SIZE: int = 100
+    FLUSH_INTERVAL: int = 10  # seconds
     
-    # Twilio Settings
-    TWILIO_ACCOUNT_SID: Optional[str] = None
-    TWILIO_AUTH_TOKEN: Optional[str] = None
-    TWILIO_PHONE_NUMBER: Optional[str] = None
-    
-    # AWS SNS Settings
-    AWS_ACCESS_KEY_ID: Optional[str] = None
-    AWS_SECRET_ACCESS_KEY: Optional[str] = None
-    AWS_REGION: Optional[str] = None
-    
-    # Nexmo Settings
-    NEXMO_API_KEY: Optional[str] = None
-    NEXMO_API_SECRET: Optional[str] = None
-    NEXMO_FROM: Optional[str] = None
-    
-    # Retry Configuration
-    MAX_RETRIES: int = 3
-    RETRY_DELAY: int = 60  # seconds
-    RETRY_BACKOFF_FACTOR: float = 2.0  # Exponential backoff
+    # Elasticsearch Settings (Optional)
+    ELASTICSEARCH_ENABLED: bool = False
+    ELASTICSEARCH_HOST: str = "localhost"
+    ELASTICSEARCH_PORT: int = 9200
+    ELASTICSEARCH_INDEX_PREFIX: str = "notification-logs"
 
     class Config:
         env_file = ".env"
